@@ -33,16 +33,58 @@ If need be, the Taco can just as well be given as a parameter to childrens' `ini
 
 There is a live demo here: [https://ohanhi.github.io/elm-taco/](https://ohanhi.github.io/elm-taco/)
 
-To set up on your own computer, you will need `git` and `elm-reactor` 0.18 installed.
+To set up on your own computer, you will need `git`, `elm-0.18`, `node.js`, `yarnpkg`.
 
-Simply clone the repository and start up elm-reactor, then navigate your browser to [http://localhost:8000/index.html](http://localhost:8000/index.html). The first startup may take a moment.
+Also web browser with support of [Object.assign](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Object/assign) for loading `env.js`. There is also [polyfill](https://github.com/sindresorhus/object-assign).
+
+Simply clone the repository and:
+
 
 ```bash
-$ git clone https://github.com/ohanhi/elm-taco.git
-$ cd elm-taco
-$ elm-reactor
+$ git clone https://github.com/rofrol/elm-taco-browsersync.git
+$ cd elm-taco-browsersync
+$ yarn
+$ cp .env.example .env
+$ ./tools/build-dev.sh
+$ ./tools/server.js
 ```
 
+In another terminal run:
+
+```bash
+$ ./tools/browsersync.js
+```
+
+Then navigate your browser to [http://localhost:8000](http://localhost:8000).
+
+## Configuration
+
+Based on https://12factor.net/config
+
+```bash
+cp .env.example .env
+./tools/generate-env.js
+```
+
+You will get `dist/js/env.js` which is loaded to elm through flags.
+
+## Linter elm make - don't compile twice
+
+[There is a bug for that](https://github.com/mybuddymichael/linter-elm-make/issues/107).
+
+In a file `~/.atom/packages/linter-elm-make/lib/linter-elm-make.js` change line
+
+`let args = [inputFilePath, '--report=json', '--output=/dev/null', --yes'];`
+
+to
+
+`let args = [inputFilePath, '--report=json', '--output=dist/js/elm.js', '--debug', '--yes'];`
+
+Restart atom.
+
+You also need to setup main paths as is in `linter-elm-make.json` or run command as described in [Linter Elm Make: Set Main Paths](https://github.com/mybuddymichael/linter-elm-make#linter-elm-make-set-main-paths).
+
+Also for me on Windows, linter-elm-make [couldn't use elm-make when elm installed from npm](https://github.com/mybuddymichael/linter-elm-make/issues/100). I had to install elm from executable.
 
 ## File structure
 
@@ -50,23 +92,41 @@ $ elm-reactor
 .
 ├── api                     # "Mock backend", serves localization files
 │   ├── en.json
-│   ├── fi-formal.json
-│   └── fi.json
+│   ├── fi.json
+│   └── fi-formal.json
 ├── elm-package.json        # Definition of the project dependencies
-├── index.html              # The web page that initializes our app
+├── LICENSE
+├── linter-elm-make.json
+├── package.json
 ├── README.md               # This documentation
-└── src
-    ├── Decoders.elm            # All JSON decoders
-    ├── I18n.elm                # Helpers for localized strings
-    ├── Main.elm                # Main handles the Taco and AppState
-    ├── Pages
-    │   ├── Home.elm                # A Page that uses the Taco
-    │   └── Settings.elm            # A Page that can change the Taco
-    ├── Routing
-    │   ├── Helpers.elm             # Definitions of routes and some helpers
-    │   └── Router.elm              # The parent for Pages, includes the base layout
-    ├── Styles.elm              # Some elm-css
-    └── Types.elm               # All shared types
+├── src
+│   ├──  elm
+│   │   ├── Decoders.elm            # All JSON decoders
+│   │   ├── I18n.elm                # Helpers for localized strings
+│   │   ├── Main.elm                # Main handles the Taco and AppState
+│   │   ├── Pages
+│   │   │   ├── Home.elm                # A Page that uses the Taco
+│   │   │   └── Settings.elm            # A Page that can change the Taco
+│   │   ├── Routing
+│   │   │   ├── Helpers.elm             # Definitions of routes and some helpers
+│   │   │   └── Router.elm              # The parent for Pages, includes the base layout
+│   │   ├── Styles.elm              # Some elm-css
+│   │   └── Types.elm               # All shared types
+│   ├── images
+│   └── index.html              # The web page that initializes our app
+│   └── styles
+│       └── style.css
+├── tools
+│   ├── browsersync.js
+│   ├── build-dev.sh
+│   ├── build-non-elm.sh
+│   ├── build-prod.sh
+│   ├── clean.sh
+│   ├── elm-make-dev.sh
+│   ├── elm-make-prod.sh
+│   ├── generate-env.js
+│   └── server.js
+└── yarn.lock
 ```
 
 

@@ -14,10 +14,10 @@ reverseRoute : Route -> String
 reverseRoute route =
     case route of
         SettingsRoute ->
-            "#/settings"
+            "/settings"
 
         _ ->
-            "#/"
+            "/"
 
 
 routeParser : Url.Parser (Route -> a) a
@@ -31,5 +31,5 @@ routeParser =
 parseLocation : Location -> Route
 parseLocation location =
     location
-        |> Url.parseHash routeParser
+        |> Url.parsePath routeParser
         |> Maybe.withDefault NotFoundRoute
